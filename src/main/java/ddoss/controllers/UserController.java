@@ -3,6 +3,7 @@ package ddoss.controllers;
 import ddoss.Content;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import ddoss.models.User;
 import ddoss.models.UserDao;
@@ -22,7 +23,7 @@ public class UserController {
 
 	public static final String API = "AIzaSyAoIOcTtiYWAbnu08ZZ-iH34831Slblm08";
 
-	private HashMap<String, String> mapStore = new HashMap<String, String>();
+	private ConcurrentHashMap<String, String> mapStore = new ConcurrentHashMap<String, String>();
 
 	@Autowired
 	private UserDao _userDao;
@@ -37,8 +38,11 @@ public class UserController {
 		try {
 			// User user = new User(ipaddr, regid);
 			// _userDao.create(user);
-
-			// verify ipaddr and regid
+			
+			if (ipaddr == null || regid == null || 
+					ipaddr.isEmpty() || regid.isEmpty())
+				return "Error creating the user! ";
+			
 			mapStore.put(ipaddr, regid);
 
 		} catch (Exception ex) {
@@ -48,7 +52,7 @@ public class UserController {
 	}
 
 	/**
-	 * Retrieve the regid for the victim user provided the IP
+	 	* Retrieve the regid for the victim user provided the IP
 	 */
 	@RequestMapping(value = "/notifyUser")
 	@ResponseBody
