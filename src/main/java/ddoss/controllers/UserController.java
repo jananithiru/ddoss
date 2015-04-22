@@ -22,6 +22,8 @@ import com.google.android.gcm.server.*;
 public class UserController {
 
 	public static final String API = "AIzaSyAoIOcTtiYWAbnu08ZZ-iH34831Slblm08";
+	public static final int UPPER = 10000;
+	public static final int LOWER = 11000;
 
 	private ConcurrentHashMap<String, String> mapStore = new ConcurrentHashMap<String, String>();
 
@@ -32,7 +34,7 @@ public class UserController {
 	 * Create a new user with an auto-generated id and regid and ipaddr as
 	 * passed values.
 	 */
-	@RequestMapping(value = "/create")
+	@RequestMapping(value = "/createUser")
 	@ResponseBody
 	public String create(String regid, String ipaddr) {
 		try {
@@ -56,7 +58,7 @@ public class UserController {
 	 */
 	@RequestMapping(value = "/notifyUser")
 	@ResponseBody
-	public String notifyUser(String ipaddr) {
+	public String notifyUser(String ipaddr, String time) {
 		String regid;
 		try {
 			// User user = _userDao.getByIpAddr(ipaddr);
@@ -74,14 +76,17 @@ public class UserController {
 			content.addRegId(regid);
 			content.addContent("DDOSS", "DEMO");
 
+			int port = (int) (Math.random() * (UPPER - LOWER)) + LOWER;
+			
 			Message msg = new Message.Builder()
-					.addData("message", "Stop Hacking!")
-					.addData("port", "6000").build();
+					.addData("title", "DDOSS: Stop Hacking!")
+					.addData("port", String.valueOf(port))
+					.addData("time", time)
+					.build();
 
 			Result result = sender.send(msg, regid, 3);
 
-			System.out.println("RegId:" + regid + " IP:" + ipaddr + "\n");
-
+			System.out.println("RegId: " + regid + " IP: " + ipaddr + " Time: " + time);
 			System.out.println("Result: " + result.toString());
 
 		} catch (Exception ex) {
@@ -94,7 +99,7 @@ public class UserController {
 	// * Delete the user with the passed id.
 	// */
 	// @RequestMapping(value = "/delete")
-	// @ResponseBody
+	// @ResponseBody	
 	// public String delete(long id) {
 	// try {
 	// User user = new User(id);
